@@ -15,8 +15,15 @@ export function navigate(hash) {
   }
 }
 
+function isTgInternalHash(raw) {
+  // Telegram WebApp on mobile injects `#tgWebAppData=...` into the hash
+  // (it's their initData transport). Treat any tgWebApp* hash as empty.
+  return raw.startsWith("tgWebApp");
+}
+
 export function run() {
-  const full = location.hash.replace(/^#/, "") || "/";
+  const raw = location.hash.replace(/^#/, "");
+  const full = !raw || isTgInternalHash(raw) ? "/" : raw;
   const [path, query = ""] = full.split("?");
   const q = Object.fromEntries(new URLSearchParams(query));
   for (const { regex, handler } of routes) {
@@ -30,7 +37,9 @@ export function run() {
 }
 
 export function getQuery() {
-  const q = (location.hash.split("?")[1] || "");
+  const raw = location.hash.replace(/^#/, "");
+  if (isTgInternalHash(raw)) return {};
+  const q = raw.split("?")[1] || "";
   return Object.fromEntries(new URLSearchParams(q));
 }
 
