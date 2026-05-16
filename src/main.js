@@ -1,5 +1,5 @@
 import { api } from "./api.js";
-import { applyStaticI18n, getLang, setLang } from "./i18n.js";
+import { applyStaticI18n, cycleLang } from "./i18n.js";
 import { navigate, route, run } from "./router.js";
 import { applyTheme, watchTheme } from "./theme.js";
 import { initTg, inTelegram, tg } from "./tg.js";
@@ -13,9 +13,7 @@ applyTheme();
 watchTheme();
 applyStaticI18n();
 
-document.querySelectorAll("#lang-switch button").forEach((b) => {
-  b.onclick = () => setLang(b.dataset.lang);
-});
+document.getElementById("lang-cycle").onclick = cycleLang;
 
 window.addEventListener("langchange", () => {
   applyStaticI18n();

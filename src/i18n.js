@@ -3,6 +3,7 @@ import ky from "../locales/ky.json";
 import en from "../locales/en.json";
 
 const dicts = { ru, ky, en };
+export const LANG_ORDER = ["ru", "ky", "en"];
 let lang = localStorage.getItem("booking_lang") || "ru";
 
 export function t(key, vars = {}) {
@@ -21,11 +22,15 @@ export function setLang(l) {
   window.dispatchEvent(new CustomEvent("langchange"));
 }
 
+export function cycleLang() {
+  const i = LANG_ORDER.indexOf(lang);
+  setLang(LANG_ORDER[(i + 1) % LANG_ORDER.length]);
+}
+
 export function applyStaticI18n() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.getAttribute("data-i18n"));
   });
-  document.querySelectorAll("#lang-switch button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.lang === lang);
-  });
+  const btn = document.getElementById("lang-cycle");
+  if (btn) btn.textContent = lang.toUpperCase();
 }
