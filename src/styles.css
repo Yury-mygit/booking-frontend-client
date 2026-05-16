@@ -178,3 +178,20 @@ button.primary:disabled { background: var(--disabled-bg); cursor: not-allowed; }
   color: #e53935;
   border-color: #e53935;
 }
+
+.fav-row-card {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.fav-row-card .h-card-photo {
+  width: 100px;
+  height: auto;
+  flex-shrink: 0;
+}
+.fav-row-card .h-card-body { flex: 1; padding: 10px; }

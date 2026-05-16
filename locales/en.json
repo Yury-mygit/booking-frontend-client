@@ -11,6 +11,7 @@
 
   "fav.add": "Add to favorites",
   "fav.remove": "Remove from favorites",
+  "fav.empty": "No favorites yet — add hotels via ♡ on their page",
   "app.loading": "Loading…",
   "app.error": "Error: {msg}",
 

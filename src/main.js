@@ -4,6 +4,7 @@ import { navigate, route, run } from "./router.js";
 import { applyTheme, watchTheme } from "./theme.js";
 import { initTg, inTelegram, tg } from "./tg.js";
 import { renderDevLogin } from "./views/auth.js";
+import { renderFavorites } from "./views/favorites.js";
 import { renderHome } from "./views/home.js";
 import { renderHotel } from "./views/hotel.js";
 import { renderMyBookings } from "./views/my_bookings.js";
@@ -25,6 +26,7 @@ route("/", renderHome);
 route("/search", renderSearch);
 route("/hotel/{id}", renderHotel);
 route("/my", renderMyBookings);
+route("/favorites", renderFavorites);
 route("/login", () => renderDevLogin(() => navigate("/")));
 
 // Two transports for the deep-link to a specific hotel:
