@@ -111,3 +111,43 @@ button.primary:disabled { background: var(--disabled-bg); cursor: not-allowed; }
 .error { color: var(--error); font-size: 13px; margin-top: 6px; }
 .success { color: var(--success); font-size: 13px; margin-top: 6px; }
 .muted { color: var(--text-faint); font-size: 13px; }
+
+.carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+  margin: 0 -14px;
+  padding-left: 14px;
+  padding-right: 14px;
+  scrollbar-width: thin;
+}
+.carousel::-webkit-scrollbar { height: 6px; }
+.carousel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.h-card {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.h-card-photo {
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-soft);
+}
+.h-card-photo-empty {
+  background-image: linear-gradient(135deg, var(--surface-soft) 0%, var(--border-soft) 100%);
+}
+.h-card-body { padding: 10px; }
+.h-card-body h3 { margin: 0 0 4px; font-size: 14px; line-height: 1.3; }
+.h-card-body .meta { font-size: 12px; color: var(--text-muted); }
+.h-card-body .price { font-weight: 600; font-size: 13px; color: var(--accent); margin-top: 6px; }

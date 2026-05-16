@@ -2,6 +2,7 @@ import { api } from "../api.js";
 import { t } from "../i18n.js";
 import { getQuery, navigate } from "../router.js";
 import { inTelegram, tg } from "../tg.js";
+import { rememberViewed } from "./home.js";
 
 // Username клиентского бота. Должен совпадать с tg-username
 // `@rforge_stay_bot` (см. notes/secrets.md).
@@ -34,6 +35,7 @@ export async function renderHotel({ id }) {
     app.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
     return;
   }
+  rememberViewed(hotel);
   const hasDates = q.check_in && q.check_out;
   app.innerHTML = `
     <p><a href="#/search">${t("hotel.back")}</a></p>

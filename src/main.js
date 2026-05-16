@@ -4,6 +4,7 @@ import { navigate, route, run } from "./router.js";
 import { applyTheme, watchTheme } from "./theme.js";
 import { initTg, inTelegram, tg } from "./tg.js";
 import { renderDevLogin } from "./views/auth.js";
+import { renderHome } from "./views/home.js";
 import { renderHotel } from "./views/hotel.js";
 import { renderMyBookings } from "./views/my_bookings.js";
 import { renderSearch } from "./views/search.js";
@@ -20,11 +21,11 @@ window.addEventListener("langchange", () => {
   run();
 });
 
-route("/", renderSearch);
+route("/", renderHome);
 route("/search", renderSearch);
 route("/hotel/{id}", renderHotel);
 route("/my", renderMyBookings);
-route("/login", () => renderDevLogin(() => navigate("/search")));
+route("/login", () => renderDevLogin(() => navigate("/")));
 
 // Two transports for the deep-link to a specific hotel:
 //   1. Telegram WebApp start_param (from t.me/BOT?startapp=hotel_5) — Mini App only.
