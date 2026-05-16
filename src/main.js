@@ -35,11 +35,16 @@ route("/login", () => renderDevLogin(() => {
 //   2. Telegram WebApp start_param hotel_5[_ci_co_g] (Mini App / startapp= deep-link).
 function applyStartParam(sp) {
   if (!sp) return false;
-  const m = sp.match(/^hotel_(\d+)(?:_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_(\d+))?$/);
+  // Try full form first: hotel_<slug>_<ci>_<co>_<guests>
+  let m = sp.match(/^hotel_(.+)_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_(\d+)$/);
+  if (m) {
+    const [, id, ci, co, g] = m;
+    location.hash = `#/hotel/${id}?check_in=${ci}&check_out=${co}&guests=${g}`;
+    return true;
+  }
+  m = sp.match(/^hotel_(.+)$/);
   if (!m) return false;
-  const [, id, ci, co, g] = m;
-  const q = ci ? `?check_in=${ci}&check_out=${co}&guests=${g}` : "";
-  location.hash = `#/hotel/${id}${q}`;
+  location.hash = `#/hotel/${m[1]}`;
   return true;
 }
 

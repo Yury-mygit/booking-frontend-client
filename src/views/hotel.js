@@ -14,8 +14,8 @@ function escapeHtml(s) {
   );
 }
 
-function buildTelegramDeepLink(hotelId, ci, co, g) {
-  const base = `hotel_${hotelId}`;
+function buildTelegramDeepLink(hotelSlug, ci, co, g) {
+  const base = `hotel_${hotelSlug}`;
   const sp = ci && co ? `${base}_${ci}_${co}_${g || 1}` : base;
   return `https://t.me/${CLIENT_BOT}?startapp=${sp}`;
 }
@@ -173,7 +173,7 @@ async function submitBook(roomId, mount) {
   }
 
   if (!inTelegram && !api.hasToken()) {
-    const link = buildTelegramDeepLink(_state.hotel.id, ci, co, g);
+    const link = buildTelegramDeepLink(_state.hotel.slug, ci, co, g);
     mount.innerHTML = `
       <div class="modal-bg"><div class="modal" style="text-align:center">
         <p>${t("book.need_telegram")}</p>
@@ -256,7 +256,7 @@ async function doBook(roomId) {
   const h = _state.hotel;
 
   if (!inTelegram && !api.hasToken()) {
-    const link = buildTelegramDeepLink(h.id, q.check_in, q.check_out, q.guests);
+    const link = buildTelegramDeepLink(h.slug, q.check_in, q.check_out, q.guests);
     res.innerHTML = `
       <div class="card" style="text-align:center">
         <p>${t("book.need_telegram")}</p>
