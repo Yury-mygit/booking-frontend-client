@@ -1,4 +1,5 @@
 import { api } from "../api.js";
+import { isFavorite, refreshSnapshot, toggleFavorite } from "../favorites.js";
 import { t } from "../i18n.js";
 import { getQuery, navigate } from "../router.js";
 import { inTelegram, tg } from "../tg.js";
@@ -36,10 +37,19 @@ export async function renderHotel({ id }) {
     return;
   }
   rememberViewed(hotel);
+  refreshSnapshot(hotel);
   const hasDates = q.check_in && q.check_out;
+  const fav = isFavorite(hotel.id);
   app.innerHTML = `
     <p><a href="#/search">${t("hotel.back")}</a></p>
-    <h1>${escapeHtml(hotel.name_ru)}</h1>
+    <div class="hotel-head">
+      <h1>${escapeHtml(hotel.name_ru)}</h1>
+      <button class="fav-toggle ${fav ? "on" : ""}" id="fav-btn"
+        title="${fav ? t("fav.remove") : t("fav.add")}"
+        aria-label="${fav ? t("fav.remove") : t("fav.add")}">
+        ${fav ? "❤" : "♡"}
+      </button>
+    </div>
     <div class="meta">${escapeHtml(hotel.city)}${hotel.address ? " · " + escapeHtml(hotel.address) : ""}</div>
     ${hotel.description_ru ? `<p>${escapeHtml(hotel.description_ru)}</p>` : ""}
     <h2>${t("hotel.rooms")}</h2>
@@ -52,6 +62,15 @@ export async function renderHotel({ id }) {
   app.querySelectorAll("button[data-book-room]").forEach((b) => {
     b.onclick = () => doBook(b.dataset.bookRoom, id, q);
   });
+  document.getElementById("fav-btn").onclick = () => {
+    const on = toggleFavorite(hotel);
+    const btn = document.getElementById("fav-btn");
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "❤" : "♡";
+    const label = on ? t("fav.remove") : t("fav.add");
+    btn.title = label;
+    btn.setAttribute("aria-label", label);
+  };
 }
 
 function renderRoom(r, q) {

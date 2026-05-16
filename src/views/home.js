@@ -1,4 +1,5 @@
 import { api } from "../api.js";
+import { listFavorites } from "../favorites.js";
 import { t } from "../i18n.js";
 
 const VIEWED_KEY = "viewed_hotels";
@@ -56,7 +57,12 @@ function cardHtml(h) {
 
 export async function renderHome() {
   const app = document.getElementById("app");
+  const favorites = listFavorites();
   app.innerHTML = `
+    ${favorites.length ? `
+      <h2 style="margin-top:0">${t("home.favorites")}</h2>
+      <div class="carousel">${favorites.map(cardHtml).join("")}</div>
+    ` : ""}
     <h1>${t("home.title")}</h1>
     <div id="carousel-mount">${t("app.loading")}</div>
     <h2>${t("home.viewed")}</h2>
