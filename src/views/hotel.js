@@ -111,7 +111,7 @@ function roomCardHtml(r, hasDates) {
   return `
     <div class="room ${unavail ? "unavailable" : ""}">
       <h3>${escapeHtml(r.name_ru)}</h3>
-      <div class="meta">${t("hotel.capacity", { n: r.capacity })}${r.floor != null ? ` · ${t("hotel.floor", { n: r.floor })}` : ""}</div>
+      <div class="meta">${t("hotel.capacity", { n: r.capacity })}${r.beds != null ? ` · ${t("hotel.beds", { n: r.beds })}` : ""}${r.floor != null ? ` · ${t("hotel.floor", { n: r.floor })}` : ""}</div>
       <div class="price">${t("hotel.price_per_night", { price: r.price_kgs })}</div>
       ${hasDates && r.total_kgs_for_dates != null ? `<div class="meta">${t("hotel.total", { total: r.total_kgs_for_dates })}</div>` : ""}
       ${unavail

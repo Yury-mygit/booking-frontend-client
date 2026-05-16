@@ -14,6 +14,7 @@
   "tabs.services": "Services",
 
   "hotel.capacity": "Capacity: {n}",
+  "hotel.beds": "Beds: {n}",
   "hotel.floor": "Floor: {n}",
   "hotel.price_per_night": "{price} KGS/night",
   "hotel.total": "Total: {total} KGS",

@@ -14,6 +14,7 @@
   "tabs.services": "Кызматтар",
 
   "hotel.capacity": "Сыйымдуулук: {n}",
+  "hotel.beds": "Керебеттер: {n}",
   "hotel.floor": "Кабат: {n}",
   "hotel.price_per_night": "{price} сом/түнгө",
   "hotel.total": "Бардыгы: {total} сом",
