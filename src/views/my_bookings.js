@@ -13,6 +13,11 @@ function escapeHtml(s) {
 export async function renderMyBookings() {
   const app = document.getElementById("app");
   app.innerHTML = `<h1>${t("my.title")}</h1><div id="list">${t("app.loading")}</div>`;
+  if (!api.hasToken()) {
+    document.getElementById("list").innerHTML =
+      `<p class="muted">${t("book.need_telegram")} <a href="#/login">${t("book.dev_login")}</a></p>`;
+    return;
+  }
   try {
     const items = await api.myBookings();
     const list = document.getElementById("list");

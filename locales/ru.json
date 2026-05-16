@@ -31,6 +31,12 @@
   "hotel.unavailable": "Недоступно",
   "hotel.booked_ok": "Бронь создана: {code}",
 
+  "book.need_telegram": "Для бронирования откройте этот отель в Telegram-боте",
+  "book.open_in_telegram": "Открыть в Telegram",
+  "book.or_dev_login": "Или:",
+  "book.dev_login": "войти как тестовый пользователь",
+
+
   "my.title": "Мои брони",
   "my.empty": "У вас ещё нет броней",
   "my.code": "Код: {code}",

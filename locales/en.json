@@ -31,6 +31,12 @@
   "hotel.unavailable": "Unavailable",
   "hotel.booked_ok": "Booked: {code}",
 
+  "book.need_telegram": "To book this hotel, open it in our Telegram bot",
+  "book.open_in_telegram": "Open in Telegram",
+  "book.or_dev_login": "Or:",
+  "book.dev_login": "sign in as a test user",
+
+
   "my.title": "My bookings",
   "my.empty": "No bookings yet",
   "my.code": "Code: {code}",

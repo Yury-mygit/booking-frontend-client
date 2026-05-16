@@ -31,6 +31,12 @@
   "hotel.unavailable": "Жеткиликсиз",
   "hotel.booked_ok": "Бронь түзүлдү: {code}",
 
+  "book.need_telegram": "Брондоо үчүн Telegram-ботту ачыңыз",
+  "book.open_in_telegram": "Telegram'да ачуу",
+  "book.or_dev_login": "Же:",
+  "book.dev_login": "тест колдонуучу катары кирүү",
+
+
   "my.title": "Менин брондорум",
   "my.empty": "Бронь жок",
   "my.code": "Код: {code}",
