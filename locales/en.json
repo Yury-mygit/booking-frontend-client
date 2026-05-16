@@ -1,40 +1,17 @@
 {
-  "nav.home": "Home",
-  "nav.search": "Search",
-  "nav.my": "My bookings",
-
-  "home.title": "Hotels",
-  "home.viewed": "Recently viewed",
-  "home.viewed_empty": "Hotels you viewed will appear here",
-  "home.empty": "No published hotels yet",
-  "home.favorites": "Favorites",
-
-  "fav.add": "Add to favorites",
-  "fav.remove": "Remove from favorites",
-  "fav.empty": "No favorites yet — add hotels via ♡ on their page",
   "app.loading": "Loading…",
   "app.error": "Error: {msg}",
+  "app.no_hotel": "Open the hotel via the link from the hotelier.",
 
   "auth.dev_title": "Dev login (no Telegram)",
   "auth.tg_id": "Telegram ID",
   "auth.first_name": "Name",
   "auth.login": "Sign in",
-  "auth.logout": "Sign out",
-  "auth.welcome": "Hi, {name}",
 
-  "search.title": "Find a hotel",
-  "search.city": "City",
-  "search.city_ph": "Bishkek, Karakol…",
-  "search.check_in": "Check-in",
-  "search.check_out": "Check-out",
-  "search.guests": "Guests",
-  "search.go": "Search",
-  "search.empty": "Nothing found",
-  "search.from_price": "from {price} KGS",
+  "tabs.rooms": "Rooms",
+  "tabs.my": "My bookings",
+  "tabs.services": "Services",
 
-  "hotel.back": "← Back to search",
-  "hotel.rooms": "Rooms",
-  "hotel.no_dates": "Pick dates to see prices",
   "hotel.capacity": "Capacity: {n}",
   "hotel.price_per_night": "{price} KGS/night",
   "hotel.total": "Total: {total} KGS",
@@ -42,14 +19,15 @@
   "hotel.unavailable": "Unavailable",
   "hotel.booked_ok": "Booked: {code}",
 
-  "book.need_telegram": "To book this hotel, open it in our Telegram bot",
-  "book.open_in_telegram": "Open in Telegram",
-  "book.or_dev_login": "Or:",
-  "book.dev_login": "sign in as a test user",
+  "rooms.filter.guests": "Guests",
+  "rooms.empty_filter": "No rooms with this capacity",
+  "rooms.dates_label": "Dates",
+  "rooms.check_in": "Check-in",
+  "rooms.check_out": "Check-out",
+  "rooms.apply_dates": "Apply dates",
+  "rooms.no_dates": "Pick dates to see availability and total",
 
-
-  "my.title": "My bookings",
-  "my.empty": "No bookings yet",
+  "my.empty_for_hotel": "You have no bookings at this hotel",
   "my.code": "Code: {code}",
   "my.dates": "{ci} → {co}",
   "my.guests": "{n} guests",
@@ -57,5 +35,13 @@
   "my.status.pending": "awaiting payment",
   "my.status.paid": "paid",
   "my.status.cancelled": "cancelled",
-  "my.status.refunded": "refunded"
+  "my.status.refunded": "refunded",
+  "my.need_auth": "Sign in to see your bookings. ",
+  "my.dev_login": "test login",
+
+  "services.empty": "No additional services",
+  "services.free": "free",
+
+  "book.need_telegram": "To book, open this hotel in our Telegram bot",
+  "book.open_in_telegram": "Open in Telegram"
 }

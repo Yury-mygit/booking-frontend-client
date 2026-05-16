@@ -1,12 +1,8 @@
 import { api } from "../api.js";
-import { isFavorite, refreshSnapshot, toggleFavorite } from "../favorites.js";
 import { t } from "../i18n.js";
-import { getQuery, navigate } from "../router.js";
+import { getQuery } from "../router.js";
 import { inTelegram, tg } from "../tg.js";
-import { rememberViewed } from "./home.js";
 
-// Username клиентского бота. Должен совпадать с tg-username
-// `@rforge_stay_bot` (см. notes/secrets.md).
 const CLIENT_BOT = "rforge_stay_bot";
 
 function escapeHtml(s) {
@@ -19,62 +15,118 @@ function escapeHtml(s) {
 }
 
 function buildTelegramDeepLink(hotelId, ci, co, g) {
-  // start_param: hotel_5 OR hotel_5_2026-06-01_2026-06-03_2.
   const base = `hotel_${hotelId}`;
   const sp = ci && co ? `${base}_${ci}_${co}_${g || 1}` : base;
   return `https://t.me/${CLIENT_BOT}?startapp=${sp}`;
 }
 
+let _state = {
+  hotel: null,
+  query: {},
+  guestsFilter: 1,
+  activeTab: "rooms",
+};
+
 export async function renderHotel({ id }) {
   const app = document.getElementById("app");
-  const q = getQuery();
   app.innerHTML = `<p>${t("app.loading")}</p>`;
-  let hotel;
+  const q = getQuery();
+  _state.query = q;
+  _state.guestsFilter = Number(q.guests) || 1;
   try {
-    hotel = await api.hotelDetails(id, q);
+    _state.hotel = await api.hotelDetails(id, q);
   } catch (e) {
     app.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
     return;
   }
-  rememberViewed(hotel);
-  refreshSnapshot(hotel);
-  const hasDates = q.check_in && q.check_out;
-  const fav = isFavorite(hotel.id);
+  const h = _state.hotel;
+  const photo = (h.photos && h.photos[0]) || "";
+  document.getElementById("topbar-title").textContent = h.name_ru;
   app.innerHTML = `
-    <p><a href="#/search">${t("hotel.back")}</a></p>
-    <div class="hotel-head">
-      <h1>${escapeHtml(hotel.name_ru)}</h1>
-      <button class="fav-toggle ${fav ? "on" : ""}" id="fav-btn"
-        title="${fav ? t("fav.remove") : t("fav.add")}"
-        aria-label="${fav ? t("fav.remove") : t("fav.add")}">
-        ${fav ? "❤" : "♡"}
-      </button>
+    <div class="hotel-head-card">
+      ${photo ? `<div class="hotel-head-photo" style="background-image:url('${escapeHtml(photo)}')"></div>` : ""}
+      <div class="hotel-head-body">
+        <h1>${escapeHtml(h.name_ru)}</h1>
+        <div class="meta">${escapeHtml(h.city)}${h.address ? " · " + escapeHtml(h.address) : ""}</div>
+        ${h.description_ru ? `<p>${escapeHtml(h.description_ru)}</p>` : ""}
+      </div>
     </div>
-    <div class="meta">${escapeHtml(hotel.city)}${hotel.address ? " · " + escapeHtml(hotel.address) : ""}</div>
-    ${hotel.description_ru ? `<p>${escapeHtml(hotel.description_ru)}</p>` : ""}
-    <h2>${t("hotel.rooms")}</h2>
-    ${!hasDates ? `<p class="muted">${t("hotel.no_dates")}</p>` : ""}
+    <div class="tabs">
+      <button class="tab" data-tab="rooms">${t("tabs.rooms")}</button>
+      <button class="tab" data-tab="my">${t("tabs.my")}</button>
+      <button class="tab" data-tab="services">${t("tabs.services")}</button>
+    </div>
+    <div id="tab-body"></div>
+  `;
+  document.querySelectorAll(".tab").forEach((b) => {
+    b.onclick = () => switchTab(b.dataset.tab);
+  });
+  switchTab(_state.activeTab);
+}
+
+function switchTab(name) {
+  _state.activeTab = name;
+  document.querySelectorAll(".tab").forEach((b) =>
+    b.classList.toggle("active", b.dataset.tab === name),
+  );
+  const body = document.getElementById("tab-body");
+  if (name === "rooms") return renderRooms(body);
+  if (name === "my") return renderMyBookings(body);
+  if (name === "services") return renderServices(body);
+}
+
+function renderRooms(body) {
+  const h = _state.hotel;
+  const q = _state.query;
+  const g = _state.guestsFilter;
+  const hasDates = q.check_in && q.check_out;
+  const rooms = h.rooms.filter((r) => r.capacity >= g);
+  body.innerHTML = `
+    <div class="rooms-controls">
+      <div class="form-row">
+        <label>${t("rooms.filter.guests")}</label>
+        <input id="f-guests" type="number" min="1" max="20" value="${g}" />
+      </div>
+      <div class="form-row dates-row">
+        <div style="flex:1">
+          <label>${t("rooms.check_in")}</label>
+          <input id="f-ci" type="date" value="${q.check_in || ""}" />
+        </div>
+        <div style="flex:1">
+          <label>${t("rooms.check_out")}</label>
+          <input id="f-co" type="date" value="${q.check_out || ""}" />
+        </div>
+      </div>
+      <button class="secondary" id="apply-dates">${t("rooms.apply_dates")}</button>
+    </div>
+    ${!hasDates ? `<p class="muted">${t("rooms.no_dates")}</p>` : ""}
     <div id="rooms-list">
-      ${hotel.rooms.map((r) => renderRoom(r, q)).join("")}
+      ${rooms.length === 0
+        ? `<p class="muted">${t("rooms.empty_filter")}</p>`
+        : rooms.map((r) => roomCardHtml(r, hasDates)).join("")}
     </div>
     <div id="book-result"></div>
   `;
-  app.querySelectorAll("button[data-book-room]").forEach((b) => {
-    b.onclick = () => doBook(b.dataset.bookRoom, id, q);
-  });
-  document.getElementById("fav-btn").onclick = () => {
-    const on = toggleFavorite(hotel);
-    const btn = document.getElementById("fav-btn");
-    btn.classList.toggle("on", on);
-    btn.textContent = on ? "❤" : "♡";
-    const label = on ? t("fav.remove") : t("fav.add");
-    btn.title = label;
-    btn.setAttribute("aria-label", label);
+  document.getElementById("f-guests").onchange = (e) => {
+    _state.guestsFilter = Number(e.target.value) || 1;
+    renderRooms(body);
   };
+  document.getElementById("apply-dates").onclick = () => {
+    const ci = document.getElementById("f-ci").value;
+    const co = document.getElementById("f-co").value;
+    const gg = Number(document.getElementById("f-guests").value) || 1;
+    const params = new URLSearchParams();
+    if (ci) params.set("check_in", ci);
+    if (co) params.set("check_out", co);
+    params.set("guests", String(gg));
+    location.hash = `#/hotel/${_state.hotel.id}?${params}`;
+  };
+  body.querySelectorAll("button[data-book-room]").forEach((b) => {
+    b.onclick = () => doBook(b.dataset.bookRoom);
+  });
 }
 
-function renderRoom(r, q) {
-  const hasDates = q.check_in && q.check_out;
+function roomCardHtml(r, hasDates) {
   const unavail = hasDates && r.available_for_dates === false;
   return `
     <div class="room ${unavail ? "unavailable" : ""}">
@@ -90,26 +142,62 @@ function renderRoom(r, q) {
   `;
 }
 
-async function doBook(roomId, hotelId, q) {
-  const res = document.getElementById("book-result");
+async function renderMyBookings(body) {
+  const h = _state.hotel;
+  if (!api.hasToken()) {
+    body.innerHTML = `<p class="muted">${t("my.need_auth")}<a href="#/login">${t("my.dev_login")}</a></p>`;
+    return;
+  }
+  body.innerHTML = `<p>${t("app.loading")}</p>`;
+  try {
+    const items = await api.myBookingsAtHotel(h.id);
+    if (!items.length) {
+      body.innerHTML = `<p class="muted">${t("my.empty_for_hotel")}</p>`;
+      return;
+    }
+    body.innerHTML = items.map((b) => `
+      <div class="card">
+        <div class="meta">${t("my.code", { code: b.code })}</div>
+        <div>${t("my.dates", { ci: b.check_in, co: b.check_out })} · ${t("my.guests", { n: b.guests })}</div>
+        <div class="price">${t("my.total", { total: b.total_kgs })}</div>
+        <div class="meta">${t("my.status." + b.status)}</div>
+      </div>
+    `).join("");
+  } catch (e) {
+    body.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
+  }
+}
 
-  // Out of Telegram and no session → bounce to Telegram bot deep-link.
-  // The user lands in the bot, hits /start, and the WebApp opens with
-  // start_param=hotel_{id}_{ci}_{co}_{guests}.
+function renderServices(body) {
+  const h = _state.hotel;
+  if (!h.services || !h.services.length) {
+    body.innerHTML = `<p class="muted">${t("services.empty")}</p>`;
+    return;
+  }
+  body.innerHTML = h.services.map((s) => `
+    <div class="card">
+      <h3>${escapeHtml(s.name_ru)}</h3>
+      <div class="price">${s.price_kgs != null ? t("hotel.price_per_night", { price: s.price_kgs }).replace("/ночь", "").replace("/night", "").replace("/түнгө", "") : t("services.free")}</div>
+    </div>
+  `).join("");
+}
+
+async function doBook(roomId) {
+  const res = document.getElementById("book-result");
+  const q = _state.query;
+  const h = _state.hotel;
+
   if (!inTelegram && !api.hasToken()) {
-    const link = buildTelegramDeepLink(hotelId, q.check_in, q.check_out, q.guests);
+    const link = buildTelegramDeepLink(h.id, q.check_in, q.check_out, q.guests);
     res.innerHTML = `
       <div class="card" style="text-align:center">
         <p>${t("book.need_telegram")}</p>
-        <a class="primary" style="text-decoration:none;display:inline-block;padding:10px 16px;background:#1a73e8;color:#fff;border-radius:4px"
+        <a class="primary" style="text-decoration:none;display:inline-block;padding:10px 16px;background:var(--accent);color:var(--accent-text);border-radius:4px"
            href="${link}">${t("book.open_in_telegram")}</a>
-        <p class="muted" style="margin-top:10px">${t("book.or_dev_login")}
-          <a href="#/login">${t("book.dev_login")}</a></p>
       </div>`;
     return;
   }
 
-  // Inside Telegram but no token yet (auth failed silently in bootstrap) → retry.
   if (!api.hasToken() && inTelegram) {
     try {
       const r = await api.authTg(tg.initData);
@@ -128,8 +216,10 @@ async function doBook(roomId, hotelId, q) {
       check_out: q.check_out,
       guests: Number(q.guests) || 1,
     });
-    res.innerHTML = `<div class="success">${t("hotel.booked_ok", { code: b.code })}</div>
-      <p><a href="#/my">${t("nav.my")} →</a></p>`;
+    res.innerHTML = `<div class="success">${t("hotel.booked_ok", { code: b.code })}</div>`;
+    // Refresh details (availability changed) and stay on rooms tab.
+    _state.hotel = await api.hotelDetails(h.id, q);
+    switchTab(_state.activeTab);
   } catch (e) {
     res.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
   }

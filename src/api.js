@@ -45,25 +45,14 @@ export const api = {
     });
     return call("POST", `/auth/dev-login?${qs}`);
   },
-  whoami: () => call("GET", "/auth/whoami"),
 
-  searchHotels(params) {
-    const qs = new URLSearchParams();
-    for (const [k, v] of Object.entries(params)) {
-      if (v !== "" && v != null) qs.set(k, v);
-    }
-    return call("GET", `/public/hotels${qs.toString() ? "?" + qs : ""}`);
-  },
   hotelDetails(id, params = {}) {
     const qs = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) {
       if (v !== "" && v != null) qs.set(k, v);
     }
-    return call(
-      "GET",
-      `/public/hotels/${id}${qs.toString() ? "?" + qs : ""}`,
-    );
+    return call("GET", `/public/hotels/${id}${qs.toString() ? "?" + qs : ""}`);
   },
   createBooking: (payload) => call("POST", "/c/bookings", payload),
-  myBookings: () => call("GET", "/c/bookings"),
+  myBookingsAtHotel: (hid) => call("GET", `/c/bookings?hotel_id=${hid}`),
 };

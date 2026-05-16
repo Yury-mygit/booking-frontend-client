@@ -1,40 +1,17 @@
 {
-  "nav.home": "Башкы",
-  "nav.search": "Издөө",
-  "nav.my": "Менин брондорум",
-
-  "home.title": "Мейманканалар",
-  "home.viewed": "Сиз көрдүңүз",
-  "home.viewed_empty": "Бул жерде сиз караган мейманканалар көрүнөт",
-  "home.empty": "Жарыяланган мейманкана жок",
-  "home.favorites": "Тандалмалар",
-
-  "fav.add": "Тандалмага кошуу",
-  "fav.remove": "Тандалмадан алып салуу",
-  "fav.empty": "Тандалмаларда эч нерсе жок — мейманкана барагында ♡ басыңыз",
   "app.loading": "Жүктөлүүдө…",
   "app.error": "Ката: {msg}",
+  "app.no_hotel": "Мейманкананы шилтеме аркылуу ачыңыз.",
 
   "auth.dev_title": "Dev-кирүү (Telegram'сыз)",
   "auth.tg_id": "Telegram ID",
   "auth.first_name": "Аты",
   "auth.login": "Кирүү",
-  "auth.logout": "Чыгуу",
-  "auth.welcome": "Саламатсызбы, {name}",
 
-  "search.title": "Мейманкана издөө",
-  "search.city": "Шаар",
-  "search.city_ph": "Бишкек, Каракол…",
-  "search.check_in": "Келүү",
-  "search.check_out": "Кетүү",
-  "search.guests": "Конок саны",
-  "search.go": "Издөө",
-  "search.empty": "Эчтеме табылган жок",
-  "search.from_price": "{price} сом'дон",
+  "tabs.rooms": "Бөлмөлөр",
+  "tabs.my": "Менин брондорум",
+  "tabs.services": "Кызматтар",
 
-  "hotel.back": "← Издөөгө",
-  "hotel.rooms": "Бөлмөлөр",
-  "hotel.no_dates": "Бааны көрүү үчүн күндөрдү тандаңыз",
   "hotel.capacity": "Сыйымдуулук: {n}",
   "hotel.price_per_night": "{price} сом/түнгө",
   "hotel.total": "Бардыгы: {total} сом",
@@ -42,14 +19,15 @@
   "hotel.unavailable": "Жеткиликсиз",
   "hotel.booked_ok": "Бронь түзүлдү: {code}",
 
-  "book.need_telegram": "Брондоо үчүн Telegram-ботту ачыңыз",
-  "book.open_in_telegram": "Telegram'да ачуу",
-  "book.or_dev_login": "Же:",
-  "book.dev_login": "тест колдонуучу катары кирүү",
+  "rooms.filter.guests": "Конок саны",
+  "rooms.empty_filter": "Мындай сыйымдуулуктагы бөлмө жок",
+  "rooms.dates_label": "Күндөр",
+  "rooms.check_in": "Келүү",
+  "rooms.check_out": "Кетүү",
+  "rooms.apply_dates": "Күндөрдү колдонуу",
+  "rooms.no_dates": "Жеткиликтүүлүктү жана баасын көрүү үчүн күндөрдү тандаңыз",
 
-
-  "my.title": "Менин брондорум",
-  "my.empty": "Бронь жок",
+  "my.empty_for_hotel": "Бул мейманканада брондоруңуз жок",
   "my.code": "Код: {code}",
   "my.dates": "{ci} → {co}",
   "my.guests": "{n} конок",
@@ -57,5 +35,13 @@
   "my.status.pending": "төлөмдү күтөт",
   "my.status.paid": "төлөнгөн",
   "my.status.cancelled": "жокко чыгарылган",
-  "my.status.refunded": "кайтарылган"
+  "my.status.refunded": "кайтарылган",
+  "my.need_auth": "Брондоруңузду көрүү үчүн кириңиз. ",
+  "my.dev_login": "тест кирүү",
+
+  "services.empty": "Кошумча кызматтар жок",
+  "services.free": "акысыз",
+
+  "book.need_telegram": "Брондоо үчүн бул мейманкананы Telegram-ботто ачыңыз",
+  "book.open_in_telegram": "Telegram'да ачуу"
 }

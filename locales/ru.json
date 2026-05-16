@@ -1,40 +1,17 @@
 {
-  "nav.home": "Главная",
-  "nav.search": "Поиск",
-  "nav.my": "Мои брони",
-
-  "home.title": "Отели",
-  "home.viewed": "Вы смотрели",
-  "home.viewed_empty": "Здесь появятся отели, которые вы просматривали",
-  "home.empty": "Пока нет опубликованных отелей",
-  "home.favorites": "Избранное",
-
-  "fav.add": "В избранное",
-  "fav.remove": "Убрать из избранного",
-  "fav.empty": "В избранном пока пусто — добавьте отели через ♡ на их странице",
   "app.loading": "Загрузка…",
   "app.error": "Ошибка: {msg}",
+  "app.no_hotel": "Откройте отель по ссылке от отельера.",
 
   "auth.dev_title": "Dev-вход (без Telegram)",
   "auth.tg_id": "Telegram ID",
   "auth.first_name": "Имя",
   "auth.login": "Войти",
-  "auth.logout": "Выйти",
-  "auth.welcome": "Здравствуйте, {name}",
 
-  "search.title": "Найти отель",
-  "search.city": "Город",
-  "search.city_ph": "Bishkek, Karakol…",
-  "search.check_in": "Заезд",
-  "search.check_out": "Выезд",
-  "search.guests": "Гостей",
-  "search.go": "Найти",
-  "search.empty": "Ничего не найдено",
-  "search.from_price": "от {price} сом",
+  "tabs.rooms": "Комнаты",
+  "tabs.my": "Мои брони",
+  "tabs.services": "Услуги",
 
-  "hotel.back": "← К поиску",
-  "hotel.rooms": "Комнаты",
-  "hotel.no_dates": "Укажите даты, чтобы увидеть цены",
   "hotel.capacity": "Вместимость: {n}",
   "hotel.price_per_night": "{price} сом/ночь",
   "hotel.total": "Итого: {total} сом",
@@ -42,14 +19,15 @@
   "hotel.unavailable": "Недоступно",
   "hotel.booked_ok": "Бронь создана: {code}",
 
-  "book.need_telegram": "Для бронирования откройте этот отель в Telegram-боте",
-  "book.open_in_telegram": "Открыть в Telegram",
-  "book.or_dev_login": "Или:",
-  "book.dev_login": "войти как тестовый пользователь",
+  "rooms.filter.guests": "Гостей",
+  "rooms.empty_filter": "Нет комнат с такой вместимостью",
+  "rooms.dates_label": "Даты",
+  "rooms.check_in": "Заезд",
+  "rooms.check_out": "Выезд",
+  "rooms.apply_dates": "Применить даты",
+  "rooms.no_dates": "Укажите даты, чтобы увидеть доступность и итог",
 
-
-  "my.title": "Мои брони",
-  "my.empty": "У вас ещё нет броней",
+  "my.empty_for_hotel": "В этом отеле у вас нет броней",
   "my.code": "Код: {code}",
   "my.dates": "{ci} → {co}",
   "my.guests": "{n} гостей",
@@ -57,5 +35,13 @@
   "my.status.pending": "ожидает оплаты",
   "my.status.paid": "оплачена",
   "my.status.cancelled": "отменена",
-  "my.status.refunded": "возвращена"
+  "my.status.refunded": "возвращена",
+  "my.need_auth": "Войдите, чтобы увидеть свои брони. ",
+  "my.dev_login": "тестовый вход",
+
+  "services.empty": "Дополнительных услуг нет",
+  "services.free": "бесплатно",
+
+  "book.need_telegram": "Для бронирования откройте этот отель в Telegram-боте",
+  "book.open_in_telegram": "Открыть в Telegram"
 }

@@ -1,14 +1,10 @@
 import { api } from "./api.js";
-import { applyStaticI18n, cycleLang } from "./i18n.js";
+import { applyStaticI18n, cycleLang, t } from "./i18n.js";
 import { navigate, route, run } from "./router.js";
 import { applyTheme, watchTheme } from "./theme.js";
 import { initTg, inTelegram, tg } from "./tg.js";
 import { renderDevLogin } from "./views/auth.js";
-import { renderFavorites } from "./views/favorites.js";
-import { renderHome } from "./views/home.js";
 import { renderHotel } from "./views/hotel.js";
-import { renderMyBookings } from "./views/my_bookings.js";
-import { renderSearch } from "./views/search.js";
 
 initTg();
 applyTheme();
@@ -22,19 +18,21 @@ window.addEventListener("langchange", () => {
   run();
 });
 
-route("/", renderHome);
-route("/search", renderSearch);
-route("/hotel/{id}", renderHotel);
-route("/my", renderMyBookings);
-route("/favorites", renderFavorites);
-route("/login", () => renderDevLogin(() => navigate("/")));
+function renderNoHotel() {
+  document.getElementById("topbar-title").textContent = "";
+  document.getElementById("app").innerHTML = `<p class="muted">${t("app.no_hotel")}</p>`;
+}
 
-// Two transports for the deep-link to a specific hotel:
-//   1. Telegram WebApp start_param (from t.me/BOT?startapp=hotel_5) — Mini App only.
-//   2. Query string `?hotel=5&check_in=...` — used by the bot's inline web_app button URL.
-// The bot uses query string because Telegram mobile overwrites the page hash
-// with its own #tgWebAppData=... initData transport, so a hash like #/hotel/5
-// from the bot would be lost.
+route("/", renderNoHotel);
+route("/hotel/{id}", renderHotel);
+route("/login", () => renderDevLogin(() => {
+  if (location.hash.startsWith("#/hotel/")) run();
+  else navigate("/");
+}));
+
+// Deep-link transports:
+//   1. ?hotel=5&check_in=...&check_out=...&guests=N (used by bot's web_app button URL).
+//   2. Telegram WebApp start_param hotel_5[_ci_co_g] (Mini App / startapp= deep-link).
 function applyStartParam(sp) {
   if (!sp) return false;
   const m = sp.match(/^hotel_(\d+)(?:_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_(\d+))?$/);
@@ -58,7 +56,6 @@ function applyQueryParams() {
 }
 
 async function bootstrap() {
-  // Order matters: query-string deep-link wins over start_param.
   const fromQuery = applyQueryParams();
   const fromStart =
     !fromQuery &&
@@ -66,8 +63,8 @@ async function bootstrap() {
     tg.initDataUnsafe?.start_param &&
     applyStartParam(tg.initDataUnsafe.start_param);
 
-  // Cold start in Telegram without a deep-link → always land on the home page.
-  // (Telegram can preserve hash from a previous session; we want a fresh state.)
+  // Cold start in Telegram without a deep-link → no hotel context.
+  // Don't try to preserve previous-session hash inside TG.
   if (!fromQuery && !fromStart && inTelegram) {
     const raw = location.hash.replace(/^#/, "");
     if (raw && !raw.startsWith("tgWebApp")) {
@@ -75,13 +72,12 @@ async function bootstrap() {
     }
   }
 
-  // Best-effort silent auth. Failure is NOT fatal — public routes still render.
   if (!api.hasToken() && inTelegram) {
     try {
       const r = await api.authTg(tg.initData);
       api.setSession(r.token, r.user);
     } catch {
-      // ignore — user can still browse public pages
+      // public hotel page still works
     }
   }
   run();
