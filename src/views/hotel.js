@@ -1,6 +1,6 @@
 import { api } from "../api.js";
 import { t } from "../i18n.js";
-import { navigate } from "../router.js";
+import { getQuery, navigate } from "../router.js";
 
 function escapeHtml(s) {
   if (s == null) return "";
@@ -11,15 +11,9 @@ function escapeHtml(s) {
   );
 }
 
-function parseQuery() {
-  const hash = location.hash;
-  const q = hash.split("?")[1] || "";
-  return Object.fromEntries(new URLSearchParams(q));
-}
-
 export async function renderHotel({ id }) {
   const app = document.getElementById("app");
-  const q = parseQuery();
+  const q = getQuery();
   app.innerHTML = `<p>${t("app.loading")}</p>`;
   let hotel;
   try {

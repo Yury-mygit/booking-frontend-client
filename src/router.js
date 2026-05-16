@@ -16,15 +16,22 @@ export function navigate(hash) {
 }
 
 export function run() {
-  const path = location.hash.replace(/^#/, "") || "/";
+  const full = location.hash.replace(/^#/, "") || "/";
+  const [path, query = ""] = full.split("?");
+  const q = Object.fromEntries(new URLSearchParams(query));
   for (const { regex, handler } of routes) {
     const m = path.match(regex);
     if (m) {
-      handler(m.groups || {});
+      handler({ ...(m.groups || {}), _query: q });
       return;
     }
   }
   document.getElementById("app").textContent = "404: " + path;
+}
+
+export function getQuery() {
+  const q = (location.hash.split("?")[1] || "");
+  return Object.fromEntries(new URLSearchParams(q));
 }
 
 window.addEventListener("hashchange", run);
