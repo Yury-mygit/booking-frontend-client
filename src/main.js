@@ -58,11 +58,22 @@ function applyQueryParams() {
 }
 
 async function bootstrap() {
-  // Order matters: query-string deep-link wins over start_param wins over user-set hash.
-  applyQueryParams() ||
-    (inTelegram &&
-      tg.initDataUnsafe?.start_param &&
-      applyStartParam(tg.initDataUnsafe.start_param));
+  // Order matters: query-string deep-link wins over start_param.
+  const fromQuery = applyQueryParams();
+  const fromStart =
+    !fromQuery &&
+    inTelegram &&
+    tg.initDataUnsafe?.start_param &&
+    applyStartParam(tg.initDataUnsafe.start_param);
+
+  // Cold start in Telegram without a deep-link → always land on the home page.
+  // (Telegram can preserve hash from a previous session; we want a fresh state.)
+  if (!fromQuery && !fromStart && inTelegram) {
+    const raw = location.hash.replace(/^#/, "");
+    if (raw && !raw.startsWith("tgWebApp")) {
+      location.hash = "";
+    }
+  }
 
   // Best-effort silent auth. Failure is NOT fatal — public routes still render.
   if (!api.hasToken() && inTelegram) {
