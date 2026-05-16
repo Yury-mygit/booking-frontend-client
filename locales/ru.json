@@ -14,6 +14,7 @@
   "tabs.services": "Услуги",
 
   "hotel.capacity": "Вместимость: {n}",
+  "hotel.floor": "Этаж: {n}",
   "hotel.price_per_night": "{price} сом/ночь",
   "hotel.total": "Итого: {total} сом",
   "hotel.book": "Забронировать",
