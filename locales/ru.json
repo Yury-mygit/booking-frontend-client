@@ -2,6 +2,7 @@
   "app.loading": "Загрузка…",
   "app.error": "Ошибка: {msg}",
   "app.no_hotel": "Откройте отель по ссылке от отельера.",
+  "app.cancel": "Отмена",
 
   "auth.dev_title": "Dev-вход (без Telegram)",
   "auth.tg_id": "Telegram ID",
@@ -21,11 +22,12 @@
 
   "rooms.filter.guests": "Гостей",
   "rooms.empty_filter": "Нет комнат с такой вместимостью",
-  "rooms.dates_label": "Даты",
   "rooms.check_in": "Заезд",
   "rooms.check_out": "Выезд",
-  "rooms.apply_dates": "Применить даты",
   "rooms.no_dates": "Укажите даты, чтобы увидеть доступность и итог",
+  "rooms.dates_required": "Выберите даты заезда и выезда",
+  "rooms.confirm": "Подтвердить бронь",
+  "rooms.modal_title": "Бронирование: {room}",
 
   "my.empty_for_hotel": "В этом отеле у вас нет броней",
   "my.code": "Код: {code}",

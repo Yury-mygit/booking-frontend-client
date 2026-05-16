@@ -2,6 +2,7 @@
   "app.loading": "Жүктөлүүдө…",
   "app.error": "Ката: {msg}",
   "app.no_hotel": "Мейманкананы шилтеме аркылуу ачыңыз.",
+  "app.cancel": "Жокко чыгаруу",
 
   "auth.dev_title": "Dev-кирүү (Telegram'сыз)",
   "auth.tg_id": "Telegram ID",
@@ -21,11 +22,12 @@
 
   "rooms.filter.guests": "Конок саны",
   "rooms.empty_filter": "Мындай сыйымдуулуктагы бөлмө жок",
-  "rooms.dates_label": "Күндөр",
   "rooms.check_in": "Келүү",
   "rooms.check_out": "Кетүү",
-  "rooms.apply_dates": "Күндөрдү колдонуу",
   "rooms.no_dates": "Жеткиликтүүлүктү жана баасын көрүү үчүн күндөрдү тандаңыз",
+  "rooms.dates_required": "Келүү жана кетүү күндөрүн тандаңыз",
+  "rooms.confirm": "Бронду ырастоо",
+  "rooms.modal_title": "Брондоо: {room}",
 
   "my.empty_for_hotel": "Бул мейманканада брондоруңуз жок",
   "my.code": "Код: {code}",

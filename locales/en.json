@@ -2,6 +2,7 @@
   "app.loading": "Loading…",
   "app.error": "Error: {msg}",
   "app.no_hotel": "Open the hotel via the link from the hotelier.",
+  "app.cancel": "Cancel",
 
   "auth.dev_title": "Dev login (no Telegram)",
   "auth.tg_id": "Telegram ID",
@@ -21,11 +22,12 @@
 
   "rooms.filter.guests": "Guests",
   "rooms.empty_filter": "No rooms with this capacity",
-  "rooms.dates_label": "Dates",
   "rooms.check_in": "Check-in",
   "rooms.check_out": "Check-out",
-  "rooms.apply_dates": "Apply dates",
   "rooms.no_dates": "Pick dates to see availability and total",
+  "rooms.dates_required": "Pick check-in and check-out dates",
+  "rooms.confirm": "Confirm booking",
+  "rooms.modal_title": "Book: {room}",
 
   "my.empty_for_hotel": "You have no bookings at this hotel",
   "my.code": "Code: {code}",

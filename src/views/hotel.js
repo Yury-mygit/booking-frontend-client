@@ -87,17 +87,6 @@ function renderRooms(body) {
         <label>${t("rooms.filter.guests")}</label>
         <input id="f-guests" type="number" min="1" max="20" value="${g}" />
       </div>
-      <div class="form-row dates-row">
-        <div style="flex:1">
-          <label>${t("rooms.check_in")}</label>
-          <input id="f-ci" type="date" value="${q.check_in || ""}" />
-        </div>
-        <div style="flex:1">
-          <label>${t("rooms.check_out")}</label>
-          <input id="f-co" type="date" value="${q.check_out || ""}" />
-        </div>
-      </div>
-      <button class="secondary" id="apply-dates">${t("rooms.apply_dates")}</button>
     </div>
     ${!hasDates ? `<p class="muted">${t("rooms.no_dates")}</p>` : ""}
     <div id="rooms-list">
@@ -106,23 +95,14 @@ function renderRooms(body) {
         : rooms.map((r) => roomCardHtml(r, hasDates)).join("")}
     </div>
     <div id="book-result"></div>
+    <div id="book-modal-mount"></div>
   `;
   document.getElementById("f-guests").onchange = (e) => {
     _state.guestsFilter = Number(e.target.value) || 1;
     renderRooms(body);
   };
-  document.getElementById("apply-dates").onclick = () => {
-    const ci = document.getElementById("f-ci").value;
-    const co = document.getElementById("f-co").value;
-    const gg = Number(document.getElementById("f-guests").value) || 1;
-    const params = new URLSearchParams();
-    if (ci) params.set("check_in", ci);
-    if (co) params.set("check_out", co);
-    params.set("guests", String(gg));
-    location.hash = `#/hotel/${_state.hotel.id}?${params}`;
-  };
   body.querySelectorAll("button[data-book-room]").forEach((b) => {
-    b.onclick = () => doBook(b.dataset.bookRoom);
+    b.onclick = () => openBookModal(Number(b.dataset.bookRoom));
   });
 }
 
@@ -134,12 +114,100 @@ function roomCardHtml(r, hasDates) {
       <div class="meta">${t("hotel.capacity", { n: r.capacity })}</div>
       <div class="price">${t("hotel.price_per_night", { price: r.price_kgs })}</div>
       ${hasDates && r.total_kgs_for_dates != null ? `<div class="meta">${t("hotel.total", { total: r.total_kgs_for_dates })}</div>` : ""}
-      ${hasDates ? (unavail
+      ${unavail
         ? `<button class="primary" disabled>${t("hotel.unavailable")}</button>`
-        : `<button class="primary" data-book-room="${r.id}">${t("hotel.book")}</button>`)
-       : ""}
+        : `<button class="primary" data-book-room="${r.id}">${t("hotel.book")}</button>`}
     </div>
   `;
+}
+
+function todayPlus(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function openBookModal(roomId) {
+  const r = _state.hotel.rooms.find((x) => x.id === roomId);
+  if (!r) return;
+  const q = _state.query;
+  const mount = document.getElementById("book-modal-mount");
+  mount.innerHTML = `
+    <div class="modal-bg">
+      <div class="modal">
+        <h2>${t("rooms.modal_title", { room: escapeHtml(r.name_ru) })}</h2>
+        <div class="form-row dates-row">
+          <div style="flex:1">
+            <label>${t("rooms.check_in")}</label>
+            <input id="m-ci" type="date" value="${q.check_in || todayPlus(1)}" />
+          </div>
+          <div style="flex:1">
+            <label>${t("rooms.check_out")}</label>
+            <input id="m-co" type="date" value="${q.check_out || todayPlus(2)}" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>${t("rooms.filter.guests")} (max ${r.capacity})</label>
+          <input id="m-g" type="number" min="1" max="${r.capacity}" value="${Math.min(_state.guestsFilter, r.capacity)}" />
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="secondary" id="m-cancel">${t("app.cancel")}</button>
+          <button class="primary" id="m-ok" style="margin:0;flex:1">${t("rooms.confirm")}</button>
+        </div>
+        <div id="m-err" class="error"></div>
+      </div>
+    </div>
+  `;
+  document.getElementById("m-cancel").onclick = () => (mount.innerHTML = "");
+  document.getElementById("m-ok").onclick = () => submitBook(roomId, mount);
+}
+
+async function submitBook(roomId, mount) {
+  const ci = document.getElementById("m-ci").value;
+  const co = document.getElementById("m-co").value;
+  const g = Number(document.getElementById("m-g").value) || 1;
+  const err = document.getElementById("m-err");
+  if (!ci || !co) {
+    err.textContent = t("rooms.dates_required");
+    return;
+  }
+
+  if (!inTelegram && !api.hasToken()) {
+    const link = buildTelegramDeepLink(_state.hotel.id, ci, co, g);
+    mount.innerHTML = `
+      <div class="modal-bg"><div class="modal" style="text-align:center">
+        <p>${t("book.need_telegram")}</p>
+        <a class="primary" style="text-decoration:none;display:inline-block;padding:10px 16px;background:var(--accent);color:var(--accent-text);border-radius:4px"
+           href="${link}">${t("book.open_in_telegram")}</a>
+      </div></div>`;
+    return;
+  }
+  if (!api.hasToken() && inTelegram) {
+    try {
+      const r = await api.authTg(tg.initData);
+      api.setSession(r.token, r.user);
+    } catch (e) {
+      err.textContent = t("app.error", { msg: e.message });
+      return;
+    }
+  }
+
+  err.textContent = t("app.loading");
+  try {
+    const b = await api.createBooking({
+      room_id: Number(roomId),
+      check_in: ci,
+      check_out: co,
+      guests: g,
+    });
+    mount.innerHTML = "";
+    document.getElementById("book-result").innerHTML =
+      `<div class="success">${t("hotel.booked_ok", { code: b.code })}</div>`;
+    _state.hotel = await api.hotelDetails(_state.hotel.id, _state.query);
+    switchTab(_state.activeTab);
+  } catch (e) {
+    err.textContent = t("app.error", { msg: e.message });
+  }
 }
 
 async function renderMyBookings(body) {
