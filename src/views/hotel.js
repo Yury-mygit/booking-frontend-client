@@ -1,7 +1,11 @@
 import { api } from "../api.js";
-import { t } from "../i18n.js";
-import { getQuery } from "../router.js";
+import { getLang, t } from "../i18n.js";
+import { getQuery, navigate } from "../router.js";
 import { inTelegram, tg } from "../tg.js";
+import { mountDateRange } from "../widgets/daterange.js";
+
+const PIN_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>`;
+const BACK_SVG = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>`;
 
 const CLIENT_BOT = "rforge_stay_bot";
 
@@ -42,12 +46,17 @@ export async function renderHotel({ id }) {
   const h = _state.hotel;
   const photo = (h.photos && h.photos[0]) || "";
   document.getElementById("topbar-title").textContent = h.name_ru;
+  const addressText = [h.city, h.address].filter(Boolean).map(escapeHtml).join(" · ");
+  const hasCoords = h.lat != null && h.lng != null;
+  const pinBtn = hasCoords
+    ? `<button class="map-pin-btn" id="hotel-map-btn" type="button" aria-label="${t("hotel.location_title")}" title="${t("hotel.location_title")}">${PIN_SVG}</button>`
+    : "";
   app.innerHTML = `
     <div class="hotel-head-card">
       ${photo ? `<div class="hotel-head-photo" style="background-image:url('${escapeHtml(photo)}')"></div>` : ""}
       <div class="hotel-head-body">
         <h1>${escapeHtml(h.name_ru)}</h1>
-        <div class="meta">${escapeHtml(h.city)}${h.address ? " · " + escapeHtml(h.address) : ""}</div>
+        <div class="meta address-line">${addressText}${pinBtn}</div>
         ${h.description_ru ? `<p>${escapeHtml(h.description_ru)}</p>` : ""}
       </div>
     </div>
@@ -61,6 +70,8 @@ export async function renderHotel({ id }) {
   document.querySelectorAll(".tab").forEach((b) => {
     b.onclick = () => switchTab(b.dataset.tab);
   });
+  const mapBtn = document.getElementById("hotel-map-btn");
+  if (mapBtn) mapBtn.onclick = () => navigate(`/hotel/${h.slug || h.id}/map`);
   switchTab(_state.activeTab);
 }
 
@@ -83,9 +94,14 @@ function renderRooms(body) {
   const rooms = h.rooms.filter((r) => r.capacity >= g);
   body.innerHTML = `
     <div class="rooms-controls">
-      <div class="form-row">
-        <label>${t("rooms.filter.guests")}</label>
-        <input id="f-guests" type="number" min="1" max="20" value="${g}" />
+      <div class="filters-row">
+        <div class="filter-cell filter-cell--dates">
+          <div id="f-dates"></div>
+        </div>
+        <div class="filter-cell filter-cell--guests">
+          <label for="f-guests">${t("rooms.filter.guests")}</label>
+          <input id="f-guests" type="number" min="1" max="20" value="${g}" />
+        </div>
       </div>
     </div>
     ${!hasDates ? `<p class="muted">${t("rooms.no_dates")}</p>` : ""}
@@ -97,13 +113,37 @@ function renderRooms(body) {
     <div id="book-result"></div>
     <div id="book-modal-mount"></div>
   `;
+  mountDateRange(document.getElementById("f-dates"), {
+    start: q.check_in || null,
+    end: q.check_out || null,
+    lang: getLang(),
+    labelIn: t("rooms.check_in"),
+    labelOut: t("rooms.check_out"),
+    placeholderIn: t("rooms.pick_date"),
+    placeholderOut: t("rooms.pick_date"),
+    onChange: (start, end) => updateRangeDates(body, start, end),
+  });
   document.getElementById("f-guests").onchange = (e) => {
     _state.guestsFilter = Number(e.target.value) || 1;
+    _state.query.guests = String(_state.guestsFilter);
     renderRooms(body);
   };
   body.querySelectorAll("button[data-book-room]").forEach((b) => {
     b.onclick = () => openBookModal(Number(b.dataset.bookRoom));
   });
+}
+
+async function updateRangeDates(body, ci, co) {
+  _state.query.check_in = ci;
+  _state.query.check_out = co;
+  body.innerHTML = `<p>${t("app.loading")}</p>`;
+  try {
+    _state.hotel = await api.hotelDetails(_state.hotel.id, _state.query);
+  } catch (e) {
+    body.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
+    return;
+  }
+  renderRooms(body);
 }
 
 function roomCardHtml(r, hasDates) {
@@ -132,20 +172,15 @@ function openBookModal(roomId) {
   if (!r) return;
   const q = _state.query;
   const mount = document.getElementById("book-modal-mount");
+  const datesPicked = Boolean(q.check_in && q.check_out);
+  const datesBlock = datesPicked
+    ? `<div class="modal-summary">${t("rooms.modal_dates", { ci: q.check_in, co: q.check_out })}</div>`
+    : `<div class="form-row"><div id="m-dates"></div></div>`;
   mount.innerHTML = `
     <div class="modal-bg">
       <div class="modal">
         <h2>${t("rooms.modal_title", { room: escapeHtml(r.name_ru) })}</h2>
-        <div class="form-row dates-row">
-          <div style="flex:1">
-            <label>${t("rooms.check_in")}</label>
-            <input id="m-ci" type="date" value="${q.check_in || todayPlus(1)}" />
-          </div>
-          <div style="flex:1">
-            <label>${t("rooms.check_out")}</label>
-            <input id="m-co" type="date" value="${q.check_out || todayPlus(2)}" />
-          </div>
-        </div>
+        ${datesBlock}
         <div class="form-row">
           <label>${t("rooms.filter.guests")} (max ${r.capacity})</label>
           <input id="m-g" type="number" min="1" max="${r.capacity}" value="${Math.min(_state.guestsFilter, r.capacity)}" />
@@ -158,13 +193,31 @@ function openBookModal(roomId) {
       </div>
     </div>
   `;
+  let modalRange = null;
+  if (!datesPicked) {
+    modalRange = mountDateRange(document.getElementById("m-dates"), {
+      lang: getLang(),
+      labelIn: t("rooms.check_in"),
+      labelOut: t("rooms.check_out"),
+      placeholderIn: t("rooms.pick_date"),
+      placeholderOut: t("rooms.pick_date"),
+    });
+  }
   document.getElementById("m-cancel").onclick = () => (mount.innerHTML = "");
-  document.getElementById("m-ok").onclick = () => submitBook(roomId, mount);
+  document.getElementById("m-ok").onclick = () => submitBook(roomId, mount, datesPicked, modalRange);
 }
 
-async function submitBook(roomId, mount) {
-  const ci = document.getElementById("m-ci").value;
-  const co = document.getElementById("m-co").value;
+async function submitBook(roomId, mount, datesFromFilter, modalRange) {
+  const q = _state.query;
+  let ci, co;
+  if (datesFromFilter) {
+    ci = q.check_in;
+    co = q.check_out;
+  } else if (modalRange) {
+    const v = modalRange.getValue();
+    ci = v.start;
+    co = v.end;
+  }
   const g = Number(document.getElementById("m-g").value) || 1;
   const err = document.getElementById("m-err");
   if (!ci || !co) {
@@ -234,6 +287,57 @@ async function renderMyBookings(body) {
   } catch (e) {
     body.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
   }
+}
+
+export async function renderHotelMap({ id }) {
+  const app = document.getElementById("app");
+  app.innerHTML = `<p>${t("app.loading")}</p>`;
+  let h = _state.hotel && (String(_state.hotel.id) === id || _state.hotel.slug === id)
+    ? _state.hotel
+    : null;
+  if (!h) {
+    try {
+      h = await api.hotelDetails(id, {});
+      _state.hotel = h;
+    } catch (e) {
+      app.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
+      return;
+    }
+  }
+  const backHash = `/hotel/${h.slug || h.id}`;
+  document.getElementById("topbar-title").innerHTML =
+    `<button class="back-btn" id="map-back" type="button" aria-label="${t("app.back")}">${BACK_SVG}</button>` +
+    `<span class="topbar-text">${t("hotel.location_title")}</span>`;
+  document.getElementById("map-back").onclick = () => {
+    // Prefer history.back so query params (dates/guests) are preserved.
+    if (history.length > 1) history.back();
+    else navigate(backHash);
+  };
+
+  if (h.lat == null || h.lng == null) {
+    app.innerHTML = `<p class="muted">${t("hotel.no_coords")}</p>`;
+    return;
+  }
+  const lat = Number(h.lat);
+  const lng = Number(h.lng);
+  const d = 0.005; // ≈ 500m around the marker for default zoom
+  const bbox = `${lng - d},${lat - d},${lng + d},${lat + d}`;
+  const osmSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+  const dgisHref = `https://2gis.kg/?m=${lng}%2C${lat}%2F17&pt=${lng},${lat}`;
+
+  const addressLine = [h.city, h.address].filter(Boolean).map(escapeHtml).join(" · ");
+  app.innerHTML = `
+    <div class="map-screen">
+      ${addressLine ? `<div class="meta map-address">${addressLine}</div>` : ""}
+      <iframe class="map-frame" src="${osmSrc}" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="map-actions">
+        <a class="primary" href="${dgisHref}" target="_blank" rel="noopener">
+          ${t("hotel.open_in_2gis")}
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 function renderServices(body) {

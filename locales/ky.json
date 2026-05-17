@@ -3,6 +3,7 @@
   "app.error": "Ката: {msg}",
   "app.no_hotel": "Мейманкананы шилтеме аркылуу ачыңыз.",
   "app.cancel": "Жокко чыгаруу",
+  "app.back": "Артка",
 
   "auth.dev_title": "Dev-кирүү (Telegram'сыз)",
   "auth.tg_id": "Telegram ID",
@@ -21,6 +22,9 @@
   "hotel.book": "Брондоо",
   "hotel.unavailable": "Жеткиликсиз",
   "hotel.booked_ok": "Бронь түзүлдү: {code}",
+  "hotel.location_title": "Жайгашуусу",
+  "hotel.open_in_2gis": "2GIS'те ачуу",
+  "hotel.no_coords": "Мейманкананын координаталары көрсөтүлгөн эмес",
 
   "rooms.filter.guests": "Конок саны",
   "rooms.empty_filter": "Мындай сыйымдуулуктагы бөлмө жок",
@@ -30,6 +34,8 @@
   "rooms.dates_required": "Келүү жана кетүү күндөрүн тандаңыз",
   "rooms.confirm": "Бронду ырастоо",
   "rooms.modal_title": "Брондоо: {room}",
+  "rooms.modal_dates": "Күндөр: {ci} → {co}",
+  "rooms.pick_date": "Тандаңыз",
 
   "my.empty_for_hotel": "Бул мейманканада брондоруңуз жок",
   "my.code": "Код: {code}",

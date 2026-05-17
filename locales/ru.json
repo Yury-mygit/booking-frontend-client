@@ -3,6 +3,7 @@
   "app.error": "Ошибка: {msg}",
   "app.no_hotel": "Откройте отель по ссылке от отельера.",
   "app.cancel": "Отмена",
+  "app.back": "Назад",
 
   "auth.dev_title": "Dev-вход (без Telegram)",
   "auth.tg_id": "Telegram ID",
@@ -21,6 +22,9 @@
   "hotel.book": "Забронировать",
   "hotel.unavailable": "Недоступно",
   "hotel.booked_ok": "Бронь создана: {code}",
+  "hotel.location_title": "Расположение",
+  "hotel.open_in_2gis": "Открыть в 2GIS",
+  "hotel.no_coords": "Координаты отеля не указаны",
 
   "rooms.filter.guests": "Гостей",
   "rooms.empty_filter": "Нет комнат с такой вместимостью",
@@ -30,6 +34,8 @@
   "rooms.dates_required": "Выберите даты заезда и выезда",
   "rooms.confirm": "Подтвердить бронь",
   "rooms.modal_title": "Бронирование: {room}",
+  "rooms.modal_dates": "Даты: {ci} → {co}",
+  "rooms.pick_date": "Выберите",
 
   "my.empty_for_hotel": "В этом отеле у вас нет броней",
   "my.code": "Код: {code}",

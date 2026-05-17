@@ -3,6 +3,7 @@
   "app.error": "Error: {msg}",
   "app.no_hotel": "Open the hotel via the link from the hotelier.",
   "app.cancel": "Cancel",
+  "app.back": "Back",
 
   "auth.dev_title": "Dev login (no Telegram)",
   "auth.tg_id": "Telegram ID",
@@ -21,6 +22,9 @@
   "hotel.book": "Book now",
   "hotel.unavailable": "Unavailable",
   "hotel.booked_ok": "Booked: {code}",
+  "hotel.location_title": "Location",
+  "hotel.open_in_2gis": "Open in 2GIS",
+  "hotel.no_coords": "Hotel coordinates are not set",
 
   "rooms.filter.guests": "Guests",
   "rooms.empty_filter": "No rooms with this capacity",
@@ -30,6 +34,8 @@
   "rooms.dates_required": "Pick check-in and check-out dates",
   "rooms.confirm": "Confirm booking",
   "rooms.modal_title": "Book: {room}",
+  "rooms.modal_dates": "Dates: {ci} → {co}",
+  "rooms.pick_date": "Pick",
 
   "my.empty_for_hotel": "You have no bookings at this hotel",
   "my.code": "Code: {code}",
