@@ -29,7 +29,53 @@ let _state = {
   query: {},
   guestsFilter: 1,
   activeTab: "rooms",
+  eventSource: null,
+  refreshTimer: null,
 };
+
+function closeEventSource() {
+  if (_state.eventSource) {
+    _state.eventSource.close();
+    _state.eventSource = null;
+  }
+  if (_state.refreshTimer) {
+    clearTimeout(_state.refreshTimer);
+    _state.refreshTimer = null;
+  }
+}
+
+function ensureEventSource(hotelSlugOrId) {
+  // Keep existing subscription open across re-renders of the same hotel.
+  if (_state.eventSource && _state.eventSource.url.endsWith(`/${hotelSlugOrId}/events`)) {
+    return;
+  }
+  closeEventSource();
+  const url = `/api/v1/public/hotels/${encodeURIComponent(hotelSlugOrId)}/events`;
+  const es = new EventSource(url);
+  _state.eventSource = es;
+  es.onmessage = () => {
+    // Debounce — bursts (mass cancel by admin) shouldn't trigger N refetches.
+    if (_state.refreshTimer) clearTimeout(_state.refreshTimer);
+    _state.refreshTimer = setTimeout(async () => {
+      _state.refreshTimer = null;
+      const body = document.getElementById("tab-body");
+      if (!body || _state.activeTab !== "rooms") return;
+      try {
+        _state.hotel = await api.hotelDetails(_state.hotel.id, _state.query);
+        renderRooms(body);
+      } catch {
+        // network blip — EventSource will reconnect; ignore.
+      }
+    }, 300);
+  };
+  // es.onerror: browser auto-reconnects (server sent retry: 5000).
+}
+
+// Hook into router: any hashchange that leaves the hotel page → close SSE.
+window.addEventListener("hashchange", () => {
+  const hash = location.hash.replace(/^#/, "").split("?")[0];
+  if (!hash.startsWith("/hotel/") || hash.endsWith("/map")) closeEventSource();
+});
 
 export async function renderHotel({ id }) {
   const app = document.getElementById("app");
@@ -131,6 +177,7 @@ function renderRooms(body) {
   body.querySelectorAll("button[data-book-room]").forEach((b) => {
     b.onclick = () => openBookModal(Number(b.dataset.bookRoom));
   });
+  ensureEventSource(_state.hotel.slug || _state.hotel.id);
 }
 
 async function updateRangeDates(body, ci, co) {
