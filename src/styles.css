@@ -112,6 +112,14 @@ button.secondary {
   margin-bottom: 10px;
 }
 
+.pay-card { max-width: 480px; margin: 16px auto; }
+.pay-amount { font-size: 20px; margin: 12px 0; }
+.pay-methods { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.pay-method { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--border-soft); border-radius: 6px; cursor: pointer; }
+.pay-method input { margin: 0; }
+.pay-submit { width: 100%; padding: 12px; font-size: 15px; margin-top: 8px; }
+.pay-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .hotel-head-card {
   background: var(--surface);
   border: 1px solid var(--border-soft);

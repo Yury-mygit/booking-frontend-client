@@ -301,10 +301,7 @@ async function submitBook(roomId, mount, datesFromFilter, modalRange) {
       guests: g,
     });
     mount.innerHTML = "";
-    document.getElementById("book-result").innerHTML =
-      `<div class="success">${t("hotel.booked_ok", { code: b.code })}</div>`;
-    _state.hotel = await api.hotelDetails(_state.hotel.id, _state.query);
-    switchTab(_state.activeTab);
+    navigate(`/pay/${b.code}`);
   } catch (e) {
     err.textContent = t("app.error", { msg: e.message });
   }
@@ -323,14 +320,25 @@ async function renderMyBookings(body) {
       body.innerHTML = `<p class="muted">${t("my.empty_for_hotel")}</p>`;
       return;
     }
-    body.innerHTML = items.map((b) => `
+    body.innerHTML = items.map((b) => {
+      const payBtn = b.status === "pending" && !b.postpay
+        ? `<div style="margin-top:8px"><a class="primary" href="#/pay/${b.code}">${t("my.pay")}</a></div>`
+        : "";
+      let statusText;
+      if (b.status === "pending") {
+        statusText = b.confirmed ? t("my.status.pending_confirmed") : t("my.status.pending_unconfirmed");
+      } else {
+        statusText = t("my.status." + b.status);
+      }
+      return `
       <div class="card">
         <div class="meta">${t("my.code", { code: b.code })}</div>
         <div>${t("my.dates", { ci: b.check_in, co: b.check_out })} · ${t("my.guests", { n: b.guests })}</div>
         <div class="price">${t("my.total", { total: b.total_kgs })}</div>
-        <div class="meta">${t("my.status." + b.status)}</div>
-      </div>
-    `).join("");
+        <div class="meta">${statusText}</div>
+        ${payBtn}
+      </div>`;
+    }).join("");
   } catch (e) {
     body.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
   }
@@ -435,10 +443,7 @@ async function doBook(roomId) {
       check_out: q.check_out,
       guests: Number(q.guests) || 1,
     });
-    res.innerHTML = `<div class="success">${t("hotel.booked_ok", { code: b.code })}</div>`;
-    // Refresh details (availability changed) and stay on rooms tab.
-    _state.hotel = await api.hotelDetails(h.id, q);
-    switchTab(_state.activeTab);
+    navigate(`/pay/${b.code}`);
   } catch (e) {
     res.innerHTML = `<div class="error">${t("app.error", { msg: e.message })}</div>`;
   }

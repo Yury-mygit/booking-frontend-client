@@ -55,4 +55,7 @@ export const api = {
   },
   createBooking: (payload) => call("POST", "/c/bookings", payload),
   myBookingsAtHotel: (hid) => call("GET", `/c/bookings?hotel_id=${hid}`),
+  getBooking: (code) => call("GET", `/c/bookings/${code}`),
+  payInit: (code) => call("POST", `/c/bookings/${code}/pay/init`),
+  payConfirm: (paymentId) => call("POST", `/c/payments/${paymentId}/mock-confirm`),
 };

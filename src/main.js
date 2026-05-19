@@ -5,6 +5,7 @@ import { applyTheme, watchTheme } from "./theme.js";
 import { initTg, inTelegram, tg } from "./tg.js";
 import { renderDevLogin } from "./views/auth.js";
 import { renderHotel, renderHotelMap } from "./views/hotel.js";
+import { renderPay } from "./views/pay.js";
 
 initTg();
 applyTheme();
@@ -26,6 +27,7 @@ function renderNoHotel() {
 route("/", renderNoHotel);
 route("/hotel/{id}", renderHotel);
 route("/hotel/{id}/map", renderHotelMap);
+route("/pay/{code}", renderPay);
 route("/login", () => renderDevLogin(() => {
   if (location.hash.startsWith("#/hotel/")) run();
   else navigate("/");
