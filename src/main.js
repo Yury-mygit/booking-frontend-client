@@ -64,6 +64,27 @@ function applyQueryParams() {
 }
 
 async function bootstrap() {
+  // TG Desktop выкидывает cross-domain navigation из hub в системный браузер,
+  // и initData на client-домене не приходит. Hub в этом случае кладёт session
+  // token в URL fragment (#auth=<t>) — поднимаем сессию через /auth/whoami.
+  const authMatch = location.hash.match(/(?:^#|&)auth=([^&]+)/);
+  if (authMatch) {
+    api.adoptToken(decodeURIComponent(authMatch[1]));
+    history.replaceState(null, "", location.pathname + location.search);
+    try {
+      const w = await api.whoami();
+      const user = {
+        id: w.user_id,
+        telegram_id: w.telegram_id,
+        role: w.role,
+        lang: w.lang,
+        first_name: w.first_name,
+      };
+      api.setSession(api.authToken(), user);
+    } catch {
+      api.clearSession();
+    }
+  }
   const fromQuery = applyQueryParams();
   const fromStart =
     !fromQuery &&

@@ -29,6 +29,11 @@ export const api = {
     localStorage.setItem("booking_token", token);
     localStorage.setItem("booking_user", JSON.stringify(user));
   },
+  adoptToken(token) {
+    _token = token;
+    localStorage.setItem("booking_token", token);
+  },
+  authToken: () => _token,
   clearSession() {
     _token = "";
     _user = null;
@@ -37,6 +42,7 @@ export const api = {
   },
 
   authTg: (initData) => call("POST", "/auth/tg", { init_data: initData, requested_role: "client" }),
+  whoami: () => call("GET", "/auth/whoami"),
   authDev: (tgId, name, role = "client") => {
     const qs = new URLSearchParams({
       telegram_id: String(tgId),
